@@ -21,8 +21,31 @@ if (navigator.geolocation)
       const { longitude } = position.coords;
       //console.log(latitude, longitude);
       console.log(`https://www.google.com/maps/@${latitude},${longitude}`);
+
+      //to replace default latitude and longitude-> new array->coords
+      const coords = [latitude, longitude];
+
+      //leaflet map
+      const map = L.map('map').setView(coords, 13);
+      //console.log(map);
+
+      L.tileLayer('https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
+
+      L.marker(coords)
+        .addTo(map)
+        .bindPopup('A pretty CSS popup.<br> Easily customizable.')
+        .openPopup();
+
+      //this on method is not a part of js it is coming from leaflet library
+      map.on('click', function (mapEvent) {
+        console.log(mapEvent);
+      });
     },
     function () {
       alert('Could not get your position');
     }
   );
+//console.log(firstName);
