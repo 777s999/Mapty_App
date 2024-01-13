@@ -3,6 +3,7 @@
 class Workout {
   date = new Date();
   id = new Date() + ''.slice(-10);
+  clicks = 0;
   constructor(coords, distance, duration) {
     //this.date=...
     //this.id=...
@@ -29,6 +30,9 @@ class Workout {
     this.description = `${this.type[0].toUpperCase()} ${this.type.slice(
       1
     )} on ${months[this.date.getMonth()]}  ${this.date.getDate()}`;
+  }
+  click() {
+    this.clicks++;
   }
 }
 
@@ -83,13 +87,14 @@ class App {
   #map;
   #mapEvent;
   #workouts = [];
+  #mapZoomLevel = 13;
   constructor() {
     this._getPosition();
-
     form.addEventListener('submit', this._newWorkout.bind(this));
 
     //this closest () is an inverse query selector it selects only parent not children
     inputType.addEventListener('change', this._toggleElevationField);
+    containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
   }
 
   _getPosition() {
@@ -107,14 +112,14 @@ class App {
 
     const { latitude, longitude } = position.coords;
     //console.log(latitude, longitude);
-    console.log(`https://www.google.com/maps/@${latitude},${longitude}`);
+    // console.log(`https://www.google.com/maps/@${latitude},${longitude}`);
 
     //to replace default latitude and longitude-> new array->coords
     const coords = [latitude, longitude];
 
     //leaflet map
     //console.log(this);
-    this.#map = L.map('map').setView(coords, 10);
+    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
     //console.log(map);
 
     L.tileLayer('https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
@@ -151,8 +156,8 @@ class App {
   }
 
   _newWorkout(e) {
-    const validInputs = (...inpputs) =>
-      inputDistance.every(inp => Number.isFinite(inp));
+    const validInputs = (...inputs) =>
+      inputs.every(inp => Number.isFinite(inp));
 
     const allPositive = (...inputs) => inputs.every(inp => inp > 0);
 
@@ -198,7 +203,7 @@ class App {
     console.log(workout);
 
     //Render workout on map as marker
-    this.renderWorkoutMarker(workout);
+    this._renderWorkoutMarker(workout);
 
     //Render workout on list
     this._renderWorkout(workout);
@@ -272,6 +277,27 @@ class App {
 `;
 
     form.insertAdjacentHTML('afterend', html);
+  }
+  _moveToPopup(e) {
+    const workoutEl = e.target.closest('.workout');
+    console.log(workoutEl);
+
+    if (!workoutEl) return;
+
+    const workout = this.#workouts.find(
+      work => work.id === workoutEl.dataset.id
+    );
+    console.log(workout);
+
+    this.#map.setView(workout, coords, this.#mapZoomLevel, {
+      animate: true,
+      pan: {
+        duration: 1,
+      },
+    });
+
+    //using the public interface
+    workout.click();
   }
 }
 
