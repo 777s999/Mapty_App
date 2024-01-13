@@ -90,6 +90,11 @@ class App {
   #mapZoomLevel = 13;
   constructor() {
     this._getPosition();
+
+    //Get data from localStorage
+    this._getLocalStorage();
+
+    //Attach event handler
     form.addEventListener('submit', this._newWorkout.bind(this));
 
     //this closest () is an inverse query selector it selects only parent not children
@@ -212,6 +217,9 @@ class App {
 
     this._hideForm();
 
+    //Set local storage to all workouts
+    this._setLocalStorage();
+
     //Display marker
     //console.log(this.#mapEvent);
   }
@@ -299,10 +307,24 @@ class App {
     //using the public interface
     workout.click();
   }
+  _setLocalStorage() {
+    localStorage.setItem('workouts', JSON.stringify(this.#workouts));
+  }
+  _getLocalStorage() {
+    const data = JSON.parse(localStorage.getItem('workouts'));
+    console.log(data);
+
+    if (!data) return;
+    this.#workouts = data;
+
+    this.#workouts.forEach(work => {
+      this._renderWorkout(work);
+    });
+  }
+  reset() {
+    localStorage.removeItem('workouts');
+    location.reload();
+  }
 }
-
-// Geolocation
-
-//console.log(firstName);
 
 const app = new App();
