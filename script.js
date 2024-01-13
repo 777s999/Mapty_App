@@ -2,7 +2,7 @@
 
 class Workout {
   date = new Date();
-  id = new Date() + ''.slice(-10);
+  id = (new Date() + '').slice(-10);
   clicks = 0;
   constructor(coords, distance, duration) {
     //this.date=...
@@ -27,10 +27,11 @@ class Workout {
       'November',
       'December',
     ];
-    this.description = `${this.type[0].toUpperCase()} ${this.type.slice(
-      1
-    )} on ${months[this.date.getMonth()]}  ${this.date.getDate()}`;
+    this.description = `${this.type[0].toUpperCase()}
+     ${this.type.slice(1)} on ${months[this.date.getMonth()]} 
+      ${this.date.getDate()}`;
   }
+
   click() {
     this.clicks++;
   }
@@ -41,7 +42,7 @@ class Running extends Workout {
   constructor(coords, distance, duration, cadence) {
     super(coords, distance, duration);
     this.cadence = cadence;
-    this.type = 'running';
+    //this.type = 'running';
     this.calcPace();
     this._setDescription();
   }
@@ -57,7 +58,7 @@ class Cycling extends Workout {
   constructor(coords, distance, duration, elevationGain) {
     super(coords, distance, duration);
     this.elevationGain = elevationGain;
-    this.type = 'cycling';
+    //this.type = 'cycling';
     this.calcSpeed();
     this._setDescription();
   }
@@ -89,6 +90,7 @@ class App {
   #workouts = [];
   #mapZoomLevel = 13;
   constructor() {
+    //Get user's position
     this._getPosition();
 
     //Get data from localStorage
@@ -171,7 +173,7 @@ class App {
     //Get data from form
     const type = inputType.value;
     const distance = +inputDistance.value;
-    const duration = inputDuration.value;
+    const duration = +inputDuration.value;
     const { lat, lng } = this.#mapEvent.latlng;
     let workout;
 
@@ -287,8 +289,10 @@ class App {
     form.insertAdjacentHTML('afterend', html);
   }
   _moveToPopup(e) {
+    //BUGFIX: When we click on a workout before the map has loaded, we get an error. But there is an easy fix;
+    if (!this.#map) return;
     const workoutEl = e.target.closest('.workout');
-    console.log(workoutEl);
+    //console.log(workoutEl);
 
     if (!workoutEl) return;
 
@@ -305,14 +309,14 @@ class App {
     });
 
     //using the public interface
-    workout.click();
+    //workout.click();
   }
   _setLocalStorage() {
     localStorage.setItem('workouts', JSON.stringify(this.#workouts));
   }
   _getLocalStorage() {
     const data = JSON.parse(localStorage.getItem('workouts'));
-    console.log(data);
+    //console.log(data);
 
     if (!data) return;
     this.#workouts = data;
